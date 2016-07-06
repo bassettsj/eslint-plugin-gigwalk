@@ -1,14 +1,18 @@
-const _ = require('lodash');
-const {
-    isFlowFileAnnotation
-} = require('eslint-plugin-flowtype/dist/utilities');
+// @flow
+import _ from 'lodash';
+import { isFlowFileAnnotation } from 'eslint-plugin-flowtype/dist/utilities';
 
-const looksLikeFlowFileAnnotation = (comment) => {
+const looksLikeFlowFileAnnotation = (comment: string): boolean => {
     return /@flow/i.test(comment);
 };
 
-
-module.exports = (context) => {
+type Context = {
+    options: Array<string>,
+    getFilename: () => string,
+    getAllComments: () => Array<{ value: string }>,
+    report: Function
+};
+function requireValidFlowFileAnnotations(context: Context): any {
     const pattern = new RegExp(context.options[0] || '*');
 
     const checkThisFile = !pattern.test(context.getFilename());
@@ -43,10 +47,15 @@ module.exports = (context) => {
             }
         }
     };
-};
+}
 
-module.exports.schema = [
+const schema = [
     {
         type: 'string'
     }
 ];
+
+
+requireValidFlowFileAnnotations.schema = schema;
+
+export default requireValidFlowFileAnnotations;
